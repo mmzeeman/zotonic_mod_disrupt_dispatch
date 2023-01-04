@@ -1,0 +1,10 @@
+{application, zotonic_mod_disrupt_dispatch, [
+    {description, "Module to disrupt zotonic base dispatch rules."},
+    {vsn, "git"},
+    {registerered, []},
+    {applications, [kernel, stdlib, zotonic_core]},
+    {env, []},
+    {modules, []},
+    {maintainers, []}
+]}.
+
