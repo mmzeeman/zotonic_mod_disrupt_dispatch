@@ -1,0 +1,39 @@
+%% -*- mode: erlang -*-
+%% Base dispatch rules for zotonic
+[
+    %% The id controller redirects depending on the accept header sent by the user agent.
+    {id, ["id", id], controller_disrupt, [{delegate, controller_id}]},
+
+    %% CSS, Javascript and images from the "lib" module folders. Possibly more than one file combined in a single request.
+    {lib, ["lib",'*'], controller_disrupt, [ {delegate, controller_file},  {root,[lib]}]},
+
+    %% Automatically minified CSS, Javascript from the "lib-min" module folders. %% The files are minified with the css and js minifier implementations in
+    %% git@github.com:zotonic/z_stdlib.git
+    {lib_min, ["lib-min",'*'], controller_disrupt, [ {delegate, controller_file},  {root,[lib]}, {minify, true} ]},
+
+    {image, ["image",'*'], controller_disrupt, [ {delegate, controller_file}]},
+
+    {media_attachment, ["media","attachment","id",id], controller_disrupt, [ {delegate, controller_file_id},  {dispatch, media_attachment}]},
+    {media_attachment, ["media","attachment",'*'], controller_disrupt, [ {delegate, controller_file},  {content_disposition, attachment}]},
+
+    {media_inline, ["media","inline","id",id], controller_disrupt, [ {delegate, controller_file_id},  {dispatch, media_inline}]},
+    {media_inline, ["media","inline",'*'], controller_disrupt, [ {delegate, controller_file}, {content_disposition, inline}]},
+
+    %% API access
+    {api, ["api", '*'], controller_disrupt, [{delegate, controller_api}]},
+
+    % Used for redirects by controller_id - change this if another model should be used.
+    {api_rsc_export, [ "api", "model", "rsc_export", "get", id ], controller_disrupt, [{delegate, controller_api}]},
+
+    %% Serves the favicon.ico from "lib/images/favicon.ico" in the modules.
+    {favicon, ["favicon.ico"], controller_disrupt, [ {delegate, controller_file}, {path, "images/favicon.ico"}, {root,[lib]}, {content_disposition, inline}]},
+
+    %% Log client side javascript event. This is ignored by default `mod_logging` overrides this when enabled.
+    {jslog, ["log-client-event"], controller_disrupt, [{delegate, controller_nocontent}]},
+
+    %% robots.txt - simple allow all file
+    {robots_txt, ["robots.txt"], controller_disrupt, [ {delegate, controller_file}, {path, "misc/robots.txt"}, {root,[lib]}, {content_disposition, inline} ]},
+
+    %% Ping/pong
+    {zotonic_ping, [".zotonic", "ping"], controller_disrupt, [{delegate, controller_ping}]}
+].
